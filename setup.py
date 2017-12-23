@@ -26,7 +26,7 @@ cmdclass = {
 setup(
     name='pretix-bgukpayment',
     version='1.0.0',
-    description='This pretix plugin adds a payment provider for german Be',
+    description='This pretix plugin adds a payment provider for german Berufsgenossenschaft and Unfallkasse asking for organization name and member ID.',
     long_description=long_description,
     url='https://github.com/felixrindt/pretix-bgukpayment',
     author='Felix Rindt',

@@ -9,8 +9,9 @@ class PluginApp(AppConfig):
     class PretixPluginMeta:
         name = ugettext_lazy('Berufsgenossenschaft/Unfallkasse Payment Provider')
         author = 'Felix Rindt'
-        description = ugettext_lazy('This pretix plugin adds a payment provider for german Be')
+        description = ugettext_lazy('This pretix plugin adds a payment provider for german Berufsgenossenschaft and Unfallkasse asking for organization name and member ID.')
         visible = True
+        restricted = False
         version = '1.0.0'
 
     def ready(self):
