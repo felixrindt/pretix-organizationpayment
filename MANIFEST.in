@@ -1,0 +1,3 @@
+recursive-include pretix_bgukpayment/static *
+recursive-include pretix_bgukpayment/templates *
+recursive-include pretix_bgukpayment/locale *
