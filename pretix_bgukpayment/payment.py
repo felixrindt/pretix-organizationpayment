@@ -29,6 +29,7 @@ class BGUKPayment(BasePaymentProvider):
     def order_change_allowed(self, order):
         return False
 
+    @property
     def settings_form_fields(self):
         info_field = I18nFormField(
             label = _('Payment information text'),
@@ -75,6 +76,7 @@ class BGUKPayment(BasePaymentProvider):
 
         return OrderedDict(list(super().settings_form_fields.items()) + bguklist)
 
+    @property
     def payment_form_fields(self):
         bgukName_field = ('bguk',
             forms.ChoiceField(
