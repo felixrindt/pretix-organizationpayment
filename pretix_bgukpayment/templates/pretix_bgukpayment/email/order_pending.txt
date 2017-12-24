@@ -1,6 +1,8 @@
+{% load i18n %}
 
-{% load i18n %}{% load l10n %}{% blocktrans with additional_details=information_text code=order.full_code total=order.total|localize currency=event.currency %}
-
-Reference: {{ code }}
-Amount: {{ total }} {{ currency }}
-{{ additional_details }}{% endblocktrans %}
+{{ information_text|linebreaksbr }}<br>
+<br>
+{% trans "Selected BG/UK:" %} {{ bguk }}<br>
+{% trans "Member ID:" %} {{ memberID }}<br>
+<br>
+{{ instructions|linebreaksbr }}

@@ -13,6 +13,12 @@ class BGUKPayment(BasePaymentProvider):
     identifier = 'bgukpayment'
     verbose_name =_('BG/UK Payment')
 
+    def bguk_ids(self):
+        l = self.settings.get('organizations_list')
+        if not l:
+            l = ""
+        return [i.strip() for i in l.split('\n') if len(i) > 0]
+
     def checkout_prepare(self, request, total):
         return True
 
@@ -48,44 +54,55 @@ class BGUKPayment(BasePaymentProvider):
             help_text = _('Shown to the user when viewing an order with completed payment.'),
             widget = I18nTextarea,
         )
-        return OrderedDict(list(super().settings_form_fields.items()) + [
+        organizations_field = forms.CharField(
+            label = _('Organizations'),
+            help_text = _('Here you can provice a list of shorthand keys for all organizations you want to support. The short names should be alphanumeric and put on seperate lines. After saving you can set a display name and instructions for every organization. Be very careful about changing these.'),
+            widget = forms.Textarea(attrs={'placeholder': 'BGW\nBGN\nUKMV\n...'}),
+        )
+        bguklist = [
                 ('information_text', info_field),
                 ('payment_pending_text', pending_field),
                 ('payment_completed_text', completed_field),
-            ])
+                ('organizations_list', organizations_field),
+        ]
+        for i in self.bguk_ids():
+            bguklist.append(('bguk_label_%s' % i, I18nFormField(
+                label = _('Display name of %s' % i),
+                help_text = _('The name of %s displayed to the user' % i),
+                widget = I18nTextarea,
+                widget_kwargs={'attrs': {
+                    'rows': '1',
+                    'placeholder': 'Berufsgenossenschaft ... (%s)' % i}},
+            )))
+            bguklist.append(('bguk_instructions_%s' % i, I18nFormField(
+                label = _('Instructions for %s' % i),
+                help_text = _('The message send to the user with instructions on how to complete the payment using the %s' % i),
+                widget = I18nTextarea,
+                widget_kwargs={'attrs': {
+                    'placeholder': '1. Donwload the form from the %s\n2. Fill out the form\n3. Send the form to ...' % i}},
+            )))
+
+        return OrderedDict(list(super().settings_form_fields.items()) + bguklist)
 
     @property
     def payment_form_fields(self):
         bgukName_field = ('bguk',
             forms.ChoiceField(
             label=_('Organization'),
-            help_text=_('Name of your Berufsgenossenschaft oder \'Unfallkasse\'.'),
+            help_text=_('Name of your organization'),
             required=True,
-            choices=(
-                ("BGW", "Berufsgenossenschaft Wohlfahrt"),
-                ("UK", "Unfallkasse"),
-                ("other", "Andere Berufsgenossenschaften"),
-            ),
+            choices=[(i, self.settings.get('bguk_label_%s' % i, as_type=LazyI18nString)) for i in self.bguk_ids()]
         ))
         memberID_field = ('memberID',
             forms.CharField(
             label=_('Member ID'),
-            help_text=_('Your member ID at the BG/UK.'),
+            help_text=_('Your member ID at that organization'),
             required=True,
         ))
         return OrderedDict([
             bgukName_field,
             memberID_field,
         ])
-
-    def checkout_prepare(self, request, cart):
-        form = self.payment_form(request)
-        if form.is_valid():
-            request.session['payment_bgukpayment_bguk'] = form.cleaned_data['bguk']
-            request.session['payment_bgukpayment_memberID'] = form.cleaned_data['memberID']
-            return True
-        return False
-
 
     def payment_form_render(self, request):
         form = self.payment_form(request)
@@ -99,12 +116,14 @@ class BGUKPayment(BasePaymentProvider):
     
     def checkout_confirm_render(self, request):
         template = get_template('pretix_bgukpayment/checkout_confirm.html')
+        bguk = request.session.get('payment_bgukpayment_bguk'),
         ctx = {
             'request': request,
             'event': self.event,
             'information_text': self.settings.get('information_text', as_type=LazyI18nString),
-            'bguk': request.session.get('payment_bgukpayment_bguk'),
+            'bguk': self.settings.get('bguk_label_%s' % bguk, as_type=LazyI18nString),
             'memberID': request.session.get('payment_bgukpayment_memberID'),
+            'instructions': self.settings.get('bguk_instructions_%s' % bguk, as_type=LazyI18nString),
         }
         return template.render(ctx)
 
@@ -145,7 +164,7 @@ class BGUKPayment(BasePaymentProvider):
         ctx = {'request': request, 'event': self.event,
                'payment_info': payment_info, 
                'order': order,
-               'bguk': request.session.get('payment_bgukpayment_bguk'),
-               'memberID': request.session.get('payment_bgukpayment_memberID'),
+               'bguk': request.session.get('payment_%s_bguk' % self.identifier),
+               'memberID': request.session.get('payment_%s_memberID' % self.identifier),
         }
         return template.render(ctx)
