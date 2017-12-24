@@ -11,7 +11,7 @@ from django import forms
 
 class BGUKPayment(BasePaymentProvider):
     identifier = 'bgukpayment'
-    verbose_name =_('BG/UK Payment')
+    verbose_name = _('BG/UK Payment')
 
     def bguk_ids(self):
         l = self.settings.get('organizations_list')
@@ -19,25 +19,16 @@ class BGUKPayment(BasePaymentProvider):
             l = ""
         return [i.strip() for i in l.split('\n') if len(i) > 0]
 
-    def checkout_prepare(self, request, total):
-        return True
-
     def payment_is_valid_session(self, request):
+        if not request.session.get('payment_%s_bguk' % self.identifier):
+            return False
+        if not request.session.get('payment_%s_memberID' % self.identifier):
+            return False
         return True
 
     def order_change_allowed(self, order):
         return False
 
-    def checkout_prepare(self, request, total):
-        return True
-
-    def payment_is_valid_session(self, request):
-        return True
-
-    def checkout_confirm_render(self, request):
-        return self.payment_form_render(request)
-    
-    @property
     def settings_form_fields(self):
         info_field = I18nFormField(
             label = _('Payment information text'),
@@ -84,7 +75,6 @@ class BGUKPayment(BasePaymentProvider):
 
         return OrderedDict(list(super().settings_form_fields.items()) + bguklist)
 
-    @property
     def payment_form_fields(self):
         bgukName_field = ('bguk',
             forms.ChoiceField(
@@ -116,15 +106,17 @@ class BGUKPayment(BasePaymentProvider):
     
     def checkout_confirm_render(self, request):
         template = get_template('pretix_bgukpayment/checkout_confirm.html')
-        bguk = request.session.get('payment_bgukpayment_bguk'),
+        bguk = request.session.get('payment_%s_bguk' % self.identifier)
         ctx = {
             'request': request,
             'event': self.event,
             'information_text': self.settings.get('information_text', as_type=LazyI18nString),
             'bguk': self.settings.get('bguk_label_%s' % bguk, as_type=LazyI18nString),
-            'memberID': request.session.get('payment_bgukpayment_memberID'),
+            'memberID': request.session.get('payment_%s_memberID' % self.identifier),
             'instructions': self.settings.get('bguk_instructions_%s' % bguk, as_type=LazyI18nString),
         }
+        print("bguk======================",bguk)
+        print(ctx)
         return template.render(ctx)
 
     def order_pending_mail_render(self, order) -> str:
@@ -133,6 +125,9 @@ class BGUKPayment(BasePaymentProvider):
             'event': self.event,
             'order': order,
             'information_text': self.settings.get('information_text', as_type=LazyI18nString),
+            'bguk': self.settings.get('bguk_label_%s' % bguk, as_type=LazyI18nString),
+            'memberID': request.session.get('payment_bgukpayment_memberID'),
+            'instructions': self.settings.get('bguk_instructions_%s' % bguk, as_type=LazyI18nString),
         }
         return template.render(ctx)
 
@@ -142,6 +137,9 @@ class BGUKPayment(BasePaymentProvider):
             'event': self.event,
             'order': order,
             'information_text': self.settings.get('payment_pending_text', as_type=LazyI18nString),
+            'bguk': self.settings.get('bguk_label_%s' % bguk, as_type=LazyI18nString),
+            'memberID': request.session.get('payment_bgukpayment_memberID'),
+            'instructions': self.settings.get('bguk_instructions_%s' % bguk, as_type=LazyI18nString),
         }
         return template.render(ctx)
 
