@@ -20,14 +20,23 @@ class BGUKPayment(BasePaymentProvider):
         return [i.strip() for i in l.split('\n') if len(i) > 0]
 
     def payment_is_valid_session(self, request):
-        if not request.session.get('payment_%s_bguk' % self.identifier):
-            return False
-        if not request.session.get('payment_%s_memberID' % self.identifier):
-            return False
-        return True
+        return all([
+            request.session.get('payment_%s_bguk' % self.identifier, '') != '',
+            request.session.get('payment_%s_memberID' % self.identifier, '') != '',
+        ])
 
     def order_change_allowed(self, order):
         return False
+
+    def payment_perform(self, request, order):
+        bguk = request.session.get('payment_%s_bguk' % self.identifier, '')
+        memberID = request.session.get('payment_%s_memberID' % self.identifier, '')
+        order.payment_info = json.dumps({
+            'bguk': bguk, 
+            'memberID': memberID
+        })
+        order.save(update_fields=['payment_info'])
+        return None
 
     @property
     def settings_form_fields(self):
@@ -117,54 +126,69 @@ class BGUKPayment(BasePaymentProvider):
             'memberID': request.session.get('payment_%s_memberID' % self.identifier),
             'instructions': self.settings.get('bguk_instructions_%s' % bguk, as_type=LazyI18nString),
         }
-        print("bguk======================",bguk)
-        print(ctx)
         return template.render(ctx)
 
     def order_pending_mail_render(self, order) -> str:
         template = get_template('pretix_bgukpayment/email/order_pending.txt')
+        if order.payment_info:
+            payment_info = json.loads(order.payment_info)
+        else:
+            payment_info = None
         ctx = {
             'event': self.event,
             'order': order,
-            'information_text': self.settings.get('information_text', as_type=LazyI18nString),
-            'bguk': self.settings.get('bguk_label_%s' % bguk, as_type=LazyI18nString),
-            'memberID': request.session.get('payment_bgukpayment_memberID'),
-            'instructions': self.settings.get('bguk_instructions_%s' % bguk, as_type=LazyI18nString),
+            'information_text': self.settings.get('payment_pending_text', as_type=LazyI18nString),
+            'bguk': self.settings.get('bguk_label_%s' % payment_info['bguk'], as_type=LazyI18nString),
+            'memberID': payment_info['memberID'],
+            'instructions': self.settings.get('bguk_instructions_%s' % payment_info['bguk'], as_type=LazyI18nString),
         }
         return template.render(ctx)
 
     def order_pending_render(self, request, order) -> str:
         template = get_template('pretix_bgukpayment/pending.html')
+        if order.payment_info:
+            payment_info = json.loads(order.payment_info)
+        else:
+            payment_info = None
         ctx = {
             'event': self.event,
             'order': order,
             'information_text': self.settings.get('payment_pending_text', as_type=LazyI18nString),
-            'bguk': self.settings.get('bguk_label_%s' % bguk, as_type=LazyI18nString),
-            'memberID': request.session.get('payment_bgukpayment_memberID'),
-            'instructions': self.settings.get('bguk_instructions_%s' % bguk, as_type=LazyI18nString),
+            'bguk': self.settings.get('bguk_label_%s' % payment_info['bguk'], as_type=LazyI18nString),
+            'memberID': payment_info['memberID'],
+            'instructions': self.settings.get('bguk_instructions_%s' % payment_info['bguk'], as_type=LazyI18nString),
         }
         return template.render(ctx)
 
     def order_completed_render(self, request, order) -> str:
         template = get_template('pretix_bgukpayment/pending.html')
+        if order.payment_info:
+            payment_info = json.loads(order.payment_info)
+        else:
+            payment_info = None
         ctx = {
             'event': self.event,
             'order': order,
-            'information_text': self.settings.get('payment_completed_text', as_type=LazyI18nString),
+            'information_text': self.settings.get('payment_pending_text', as_type=LazyI18nString),
+            'bguk': self.settings.get('bguk_label_%s' % payment_info['bguk'], as_type=LazyI18nString),
+            'memberID': payment_info['memberID'],
+            'instructions': self.settings.get('bguk_instructions_%s' % payment_info['bguk'], as_type=LazyI18nString),
         }
         return template.render(ctx)
 
 
     def order_control_render(self, request, order) -> str:
+        template = get_template('pretix_bgukpayment/control.html')
         if order.payment_info:
             payment_info = json.loads(order.payment_info)
         else:
             payment_info = None
-        template = get_template('pretix_bgukpayment/control.html')
-        ctx = {'request': request, 'event': self.event,
-               'payment_info': payment_info, 
-               'order': order,
-               'bguk': request.session.get('payment_%s_bguk' % self.identifier),
-               'memberID': request.session.get('payment_%s_memberID' % self.identifier),
+        ctx = {
+            'event': self.event,
+            'order': order,
+            'information_text': self.settings.get('payment_pending_text', as_type=LazyI18nString),
+            'bguk': self.settings.get('bguk_label_%s' % payment_info['bguk'], as_type=LazyI18nString),
+            'memberID': payment_info['memberID'],
+            'instructions': self.settings.get('bguk_instructions_%s' % payment_info['bguk'], as_type=LazyI18nString),
         }
         return template.render(ctx)
