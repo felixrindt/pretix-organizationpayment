@@ -133,7 +133,7 @@ class BGUKPayment(BasePaymentProvider):
         if order.payment_info:
             payment_info = json.loads(order.payment_info)
         else:
-            payment_info = None
+            return _("No payment information available.")
         ctx = {
             'event': self.event,
             'order': order,
@@ -149,7 +149,7 @@ class BGUKPayment(BasePaymentProvider):
         if order.payment_info:
             payment_info = json.loads(order.payment_info)
         else:
-            payment_info = None
+            return _("No payment information available.")
         ctx = {
             'event': self.event,
             'order': order,
@@ -165,7 +165,7 @@ class BGUKPayment(BasePaymentProvider):
         if order.payment_info:
             payment_info = json.loads(order.payment_info)
         else:
-            payment_info = None
+            return _("No payment information available.")
         ctx = {
             'event': self.event,
             'order': order,
@@ -182,7 +182,7 @@ class BGUKPayment(BasePaymentProvider):
         if order.payment_info:
             payment_info = json.loads(order.payment_info)
         else:
-            payment_info = None
+            return _("No payment information available.")
         ctx = {
             'event': self.event,
             'order': order,
