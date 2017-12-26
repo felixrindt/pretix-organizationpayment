@@ -11,7 +11,7 @@ from django import forms
 
 class BGUKPayment(BasePaymentProvider):
     identifier = 'bgukpayment'
-    verbose_name = _('BG/UK Payment')
+    verbose_name = _('Organization Payment')
 
     def bguk_ids(self):
         l = self.settings.get('organizations_list')
@@ -57,7 +57,7 @@ class BGUKPayment(BasePaymentProvider):
         )
         organizations_field = forms.CharField(
             label = _('Organizations'),
-            help_text = _('Here you can provice a list of shorthand keys for all organizations you want to support. The short names should be alphanumeric and put on seperate lines. After saving you can set a display name and instructions for every organization. Be very careful about changing these.'),
+            help_text = _('Here you can provide a list of shorthand keys for all organizations you want to support. The short names should be alphanumeric and put on seperate lines. After saving you can set a display name and instructions for every organization. Be very careful about changing these.'),
             widget = forms.Textarea(attrs={'placeholder': 'BGW\nBGN\nUKMV\n...'}),
         )
         bguklist = [
