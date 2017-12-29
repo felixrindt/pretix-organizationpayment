@@ -68,16 +68,16 @@ class BGUKPayment(BasePaymentProvider):
         ]
         for i in self.bguk_ids():
             bguklist.append(('bguk_label_%s' % i, I18nFormField(
-                label = _('Display name of %s' % i),
-                help_text = _('The name of %s displayed to the user' % i),
+                label = _('Display name of %s') % i,
+                help_text = _('The name of %s displayed to the user') % i,
                 widget = I18nTextarea,
                 widget_kwargs={'attrs': {
                     'rows': '1',
                     'placeholder': 'Berufsgenossenschaft ... (%s)' % i}},
             )))
             bguklist.append(('bguk_instructions_%s' % i, I18nFormField(
-                label = _('Instructions for %s' % i),
-                help_text = _('The message send to the user with instructions on how to complete the payment using the %s' % i),
+                label = _('Instructions for %s') % i,
+                help_text = _('The message send to the user with instructions on how to complete the payment using the %s') % i,
                 widget = I18nTextarea,
                 widget_kwargs={'attrs': {
                     'placeholder': '1. Donwload the form from the %s \n2. Fill out the form \n3. Send the form to ...' % i}},

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-26 12:30+0100\n"
+"POT-Creation-Date: 2017-12-29 21:00+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Felix Rindt\n"
 "Language-Team: \n"
@@ -129,7 +129,6 @@ msgstr "Keine Zahlungsinformationen verfügbar."
 #: pretix_bgukpayment/templates/pretix_bgukpayment/control.html:4
 #: pretix_bgukpayment/templates/pretix_bgukpayment/email/order_pending.txt:5
 #: pretix_bgukpayment/templates/pretix_bgukpayment/pending.html:6
-#, fuzzy
 #| msgid "Organization"
 msgid "Selected organization"
 msgstr "Gewählte Organisation"
