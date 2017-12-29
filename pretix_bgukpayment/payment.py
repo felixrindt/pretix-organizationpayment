@@ -58,7 +58,7 @@ class BGUKPayment(BasePaymentProvider):
         organizations_field = forms.CharField(
             label = _('Organizations'),
             help_text = _('Here you can provide a list of shorthand keys for all organizations you want to support. The short names should be alphanumeric and put on seperate lines. After saving you can set a display name and instructions for every organization. Be very careful about changing these.'),
-            widget = forms.Textarea(attrs={'placeholder': 'BGW\nBGN\nUKMV\n...'}),
+            widget = forms.Textarea(attrs={'placeholder': 'BGW \nBGN \nUKMV \n...'}),
         )
         bguklist = [
                 ('information_text', info_field),
@@ -80,7 +80,7 @@ class BGUKPayment(BasePaymentProvider):
                 help_text = _('The message send to the user with instructions on how to complete the payment using the %s' % i),
                 widget = I18nTextarea,
                 widget_kwargs={'attrs': {
-                    'placeholder': '1. Donwload the form from the %s\n2. Fill out the form\n3. Send the form to ...' % i}},
+                    'placeholder': '1. Donwload the form from the %s \n2. Fill out the form \n3. Send the form to ...' % i}},
             )))
 
         return OrderedDict(list(super().settings_form_fields.items()) + bguklist)
