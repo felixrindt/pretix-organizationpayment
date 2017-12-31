@@ -13,6 +13,10 @@ class BGUKPayment(BasePaymentProvider):
     identifier = 'bgukpayment'
     verbose_name = _('Organization Payment')
 
+    @property
+    def verbose_name(self):
+        return self.settings.get('method_name', as_type=LazyI18nString) or 'Organization'
+
     def bguk_ids(self):
         l = self.settings.get('organizations_list')
         if not l:
@@ -40,6 +44,24 @@ class BGUKPayment(BasePaymentProvider):
 
     @property
     def settings_form_fields(self):
+        name_field = I18nFormField(
+            label = _('Payment method name'),
+            help_text=_('Name of the payment method as shown to the user'),
+            widget=I18nTextarea,
+            widget_kwargs={'attrs': {'rows': '1'}},
+        )
+        organizationname_field = I18nFormField(
+            label = _('Organization field annotation'),
+            help_text = _('The annotation for the organization selection'),
+            widget=I18nTextarea,
+            widget_kwargs={'attrs': {'rows': '1'}},
+        )
+        idname_field = I18nFormField(
+            label = _('ID field annotation'),
+            help_text = _('The annotation of the field for the users ID string'),
+            widget=I18nTextarea,
+            widget_kwargs={'attrs': {'rows': '1'}},
+        )
         info_field = I18nFormField(
             label = _('Payment information text'),
             help_text=_('Shown to the user when selecting a payment method.'),
@@ -61,6 +83,9 @@ class BGUKPayment(BasePaymentProvider):
             widget = forms.Textarea(attrs={'placeholder': 'BGW \nBGN \nUKMV \n...'}),
         )
         bguklist = [
+                ('method_name', name_field),
+                ('organizationfield_name', organizationname_field),
+                ('idfield_name', idname_field),
                 ('information_text', info_field),
                 ('payment_pending_text', pending_field),
                 ('payment_completed_text', completed_field),
@@ -73,7 +98,7 @@ class BGUKPayment(BasePaymentProvider):
                 widget = I18nTextarea,
                 widget_kwargs={'attrs': {
                     'rows': '1',
-                    'placeholder': 'Berufsgenossenschaft ... (%s)' % i}},
+                    'placeholder': 'Organization ... (%s)' % i}},
             )))
             bguklist.append(('bguk_instructions_%s' % i, I18nFormField(
                 label = _('Instructions for %s') % i,
@@ -89,15 +114,13 @@ class BGUKPayment(BasePaymentProvider):
     def payment_form_fields(self):
         bgukName_field = ('bguk',
             forms.ChoiceField(
-            label=_('Organization'),
-            help_text=_('Name of your organization'),
+            label=self.settings.get('organizationfield_name', as_type=LazyI18nString) or _('Organization'),
             required=True,
             choices=[(i, self.settings.get('bguk_label_%s' % i, as_type=LazyI18nString)) for i in self.bguk_ids()]
         ))
         memberID_field = ('memberID',
             forms.CharField(
-            label=_('Member ID'),
-            help_text=_('Your member ID at that organization'),
+            label=self.settings.get('idfield_name', as_type=LazyI18nString) or _('Member ID'),
             required=True,
         ))
         return OrderedDict([
