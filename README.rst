@@ -1,8 +1,9 @@
-Berufsgenossenschaft/Unfallkasse Payment Provider
+Organization Payment Provider
 ==========================
 
 This is a plugin for `pretix`_. 
-It adds a Payment provider for the german Berufsgenossenschaft and Unfallkasse, asking for the name of the organization and member ID.
+It adds a payment provider for organizations. A user can choose from a predefined list of organizations and also has to provide a member ID there. You can use it for university accounts or sponsor partners.
+It was originally designed for the german Berufsgenossenschaft and Unfallkasse which pay for first aid trainings employees can do. Thats where bguk comes from.
 
 
 Development setup
