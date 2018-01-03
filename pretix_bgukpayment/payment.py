@@ -160,7 +160,7 @@ class BGUKPayment(BasePaymentProvider):
         return template.render(ctx)
     
     def checkout_confirm_render(self, request):
-        template = get_template('pretix_bgukpayment/checkout_confirm.html')
+        template = get_template('pretix_bgukpayment/order.html')
         bguk = request.session.get('payment_%s_bguk' % self.identifier)
         ctx = {
             'information_text': self.information_text,
@@ -173,7 +173,7 @@ class BGUKPayment(BasePaymentProvider):
         return template.render(ctx)
 
     def order_pending_mail_render(self, order) -> str:
-        template = get_template('pretix_bgukpayment/email/order_pending.txt')
+        template = get_template('pretix_bgukpayment/order.html')
         if order.payment_info:
             payment_info = json.loads(order.payment_info)
         else:
@@ -189,7 +189,7 @@ class BGUKPayment(BasePaymentProvider):
         return template.render(ctx)
 
     def order_pending_render(self, request, order) -> str:
-        template = get_template('pretix_bgukpayment/pending.html')
+        template = get_template('pretix_bgukpayment/order.html')
         if order.payment_info:
             payment_info = json.loads(order.payment_info)
         else:
@@ -205,7 +205,7 @@ class BGUKPayment(BasePaymentProvider):
         return template.render(ctx)
 
     def order_completed_render(self, request, order) -> str:
-        template = get_template('pretix_bgukpayment/pending.html')
+        template = get_template('pretix_bgukpayment/order.html')
         if order.payment_info:
             payment_info = json.loads(order.payment_info)
         else:
