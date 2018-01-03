@@ -2,8 +2,9 @@
 {% load l10n %}
 {% load rich_text %}
 
-{{ information_text|rich_text }}<br>
+{{ information_text|rich_text }}
+<p>
 {{ orgafield_name }}: {{ bguk }}<br>
-{{ idfield_name }}: {{ memberID }}<br>
-<br>
+{{ idfield_name }}: {{ memberID }}
+</p>
 {{ instructions|rich_text }}
