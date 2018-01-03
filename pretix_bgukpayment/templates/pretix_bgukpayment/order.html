@@ -3,8 +3,10 @@
 {% load rich_text %}
 
 {{ information_text|rich_text }}
-<p>
-{{ orgafield_name }}: {{ bguk }}<br>
-{{ idfield_name }}: {{ memberID }}
-</p>
+<dl>
+	<dt>{{ orgafield_name }}</dt>
+	<dd>{{ bguk }}</dd>
+	<dt>{{ idfield_name }}</dt>
+	<dd>{{ memberID }}</dd>
+</dl>
 {{ instructions|rich_text }}
