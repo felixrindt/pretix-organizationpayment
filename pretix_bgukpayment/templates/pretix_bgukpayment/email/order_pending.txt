@@ -1,8 +1,9 @@
 {% load i18n %}
+{% load rich_text %}
 
-{{ information_text|linebreaksbr }}<br>
+{{ information_text|rich_text }}<br>
 <br>
 {{ orgafield_name }}: {{ bguk }}<br>
 {{ idfield_name }}: {{ memberID }}<br>
 <br>
-{{ instructions|linebreaksbr }}
+{{ instructions|rich_text }}

@@ -5,6 +5,7 @@ from i18nfield.fields import I18nFormField, I18nTextarea
 from i18nfield.strings import LazyI18nString
 
 from pretix.base.payment import BasePaymentProvider
+from pretix.base.templatetags.rich_text import rich_text
 from django.utils.translation import ugettext_lazy as _
 from django.template.loader import get_template
 from django import forms
@@ -20,9 +21,23 @@ class BGUKPayment(BasePaymentProvider):
     def orgafield_name(self):
         return self.settings.get('organizationfield_name', as_type=LazyI18nString) or _('Organization')
 
+    @property
     def idfield_name(self):
         return self.settings.get('idfield_name', as_type=LazyI18nString) or _('Member ID')
 
+    @property
+    def information_text(self):
+        return rich_text(self.settings.get('information_text', as_type=LazyI18nString))
+
+    @property
+    def payment_pending_text(self):
+        return rich_text(self.settings.get('payment_pending_text', as_type=LazyI18nString))
+
+    @property
+    def payment_completed_text(self):
+        return rich_text(self.settings.get('payment_completed_text', as_type=LazyI18nString))
+
+    @property
     def bguk_ids(self):
         l = self.settings.get('organizations_list')
         if not l:
@@ -97,7 +112,7 @@ class BGUKPayment(BasePaymentProvider):
                 ('payment_completed_text', completed_field),
                 ('organizations_list', organizations_field),
         ]
-        for i in self.bguk_ids():
+        for i in self.bguk_ids:
             bguklist.append(('bguk_label_%s' % i, I18nFormField(
                 label = _('Display name of %s') % i,
                 help_text = _('The name of %s displayed to the user') % i,
@@ -122,7 +137,7 @@ class BGUKPayment(BasePaymentProvider):
             forms.ChoiceField(
             label=self.orgafield_name,
             required=True,
-            choices=[(i, self.settings.get('bguk_label_%s' % i, as_type=LazyI18nString)) for i in self.bguk_ids()]
+            choices=[(i, self.settings.get('bguk_label_%s' % i, as_type=LazyI18nString)) for i in self.bguk_ids]
         ))
         memberID_field = ('memberID',
             forms.CharField(
@@ -140,7 +155,7 @@ class BGUKPayment(BasePaymentProvider):
         ctx = {
                 'request': request, 
                 'form': form,
-                'information_text': self.settings.get('information_text', as_type=LazyI18nString),
+                'information_text': self.information_text,
         }
         return template.render(ctx)
     
@@ -148,9 +163,7 @@ class BGUKPayment(BasePaymentProvider):
         template = get_template('pretix_bgukpayment/checkout_confirm.html')
         bguk = request.session.get('payment_%s_bguk' % self.identifier)
         ctx = {
-            'request': request,
-            'event': self.event,
-            'information_text': self.settings.get('information_text', as_type=LazyI18nString),
+            'information_text': self.information_text,
             'bguk': self.settings.get('bguk_label_%s' % bguk, as_type=LazyI18nString),
             'memberID': request.session.get('payment_%s_memberID' % self.identifier),
             'instructions': self.settings.get('bguk_instructions_%s' % bguk, as_type=LazyI18nString),
@@ -166,9 +179,7 @@ class BGUKPayment(BasePaymentProvider):
         else:
             return _("No payment information available.")
         ctx = {
-            'event': self.event,
-            'order': order,
-            'information_text': self.settings.get('payment_pending_text', as_type=LazyI18nString),
+            'information_text': self.payment_pending_text,
             'bguk': self.settings.get('bguk_label_%s' % payment_info['bguk'], as_type=LazyI18nString),
             'memberID': payment_info['memberID'],
             'instructions': self.settings.get('bguk_instructions_%s' % payment_info['bguk'], as_type=LazyI18nString),
@@ -184,9 +195,7 @@ class BGUKPayment(BasePaymentProvider):
         else:
             return _("No payment information available.")
         ctx = {
-            'event': self.event,
-            'order': order,
-            'information_text': self.settings.get('payment_pending_text', as_type=LazyI18nString),
+            'information_text': self.payment_pending_text,
             'bguk': self.settings.get('bguk_label_%s' % payment_info['bguk'], as_type=LazyI18nString),
             'memberID': payment_info['memberID'],
             'instructions': self.settings.get('bguk_instructions_%s' % payment_info['bguk'], as_type=LazyI18nString),
@@ -202,9 +211,7 @@ class BGUKPayment(BasePaymentProvider):
         else:
             return _("No payment information available.")
         ctx = {
-            'event': self.event,
-            'order': order,
-            'information_text': self.settings.get('payment_pending_text', as_type=LazyI18nString),
+            'information_text': self.payment_completed_text,
             'bguk': self.settings.get('bguk_label_%s' % payment_info['bguk'], as_type=LazyI18nString),
             'memberID': payment_info['memberID'],
             'instructions': self.settings.get('bguk_instructions_%s' % payment_info['bguk'], as_type=LazyI18nString),
@@ -221,12 +228,8 @@ class BGUKPayment(BasePaymentProvider):
         else:
             return _("No payment information available.")
         ctx = {
-            'event': self.event,
-            'order': order,
-            'information_text': self.settings.get('payment_pending_text', as_type=LazyI18nString),
             'bguk': self.settings.get('bguk_label_%s' % payment_info['bguk'], as_type=LazyI18nString),
             'memberID': payment_info['memberID'],
-            'instructions': self.settings.get('bguk_instructions_%s' % payment_info['bguk'], as_type=LazyI18nString),
             'orgafield_name': self.orgafield_name,
             'idfield_name': self.idfield_name,
         }
