@@ -232,5 +232,6 @@ class BGUKPayment(BasePaymentProvider):
             'memberID': payment_info['memberID'],
             'orgafield_name': self.orgafield_name,
             'idfield_name': self.idfield_name,
+            'method_name': self.verbose_name,
         }
         return template.render(ctx)
