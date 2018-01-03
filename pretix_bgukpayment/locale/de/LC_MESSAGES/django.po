@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-29 21:00+0100\n"
+"POT-Creation-Date: 2018-01-03 13:34+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Felix Rindt\n"
 "Language-Team: \n"
@@ -29,40 +29,71 @@ msgstr ""
 "frei konfiguriert werden. Zusätzlich kann man jeweils Instruktionen für den "
 "Nutzer angeben."
 
-#: pretix_bgukpayment/payment.py:14
-msgid "Organization Payment"
+#: pretix_bgukpayment/payment.py:17 pretix_bgukpayment/payment.py:21
+msgid "Organization"
 msgstr "Organisation"
 
-#: pretix_bgukpayment/payment.py:44
+#: pretix_bgukpayment/payment.py:24
+msgid "Member ID"
+msgstr "Mitgliedsnummer"
+
+#: pretix_bgukpayment/payment.py:54
+#| msgid "Payment completed text"
+msgid "Payment method name"
+msgstr "Name der Zahlungsmethode"
+
+#: pretix_bgukpayment/payment.py:55
+#| msgid "The name of %s displayed to the user"
+msgid "Name of the payment method as shown to the user"
+msgstr "Name der Zahlungsmethode, die dem Nutzer angezeigt wird"
+
+#: pretix_bgukpayment/payment.py:60
+#| msgid "Organization Payment"
+msgid "Organization field annotation"
+msgstr "Beschriftung der Organisationsauswahl"
+
+#: pretix_bgukpayment/payment.py:61
+msgid "The annotation for the organization selection"
+msgstr "Die Beschriftung für die Organisationsauswahl"
+
+#: pretix_bgukpayment/payment.py:66
+msgid "ID field annotation"
+msgstr "Mitgliedsnummer Beschriftung"
+
+#: pretix_bgukpayment/payment.py:67
+msgid "The annotation of the field for the users ID string"
+msgstr "Die Beschriftung für die Mitgliedsnummereingabe"
+
+#: pretix_bgukpayment/payment.py:72
 msgid "Payment information text"
 msgstr "Zahlungsinformationstext"
 
-#: pretix_bgukpayment/payment.py:45
+#: pretix_bgukpayment/payment.py:73
 msgid "Shown to the user when selecting a payment method."
 msgstr "Wird dem Nutzer zur Erklärung der Zahlungsmethode angezeigt."
 
-#: pretix_bgukpayment/payment.py:49
+#: pretix_bgukpayment/payment.py:77
 msgid "Payment pending text"
 msgstr "Zahlung ausstehend Text"
 
-#: pretix_bgukpayment/payment.py:50
+#: pretix_bgukpayment/payment.py:78
 msgid "Shown to the user when viewing a pending payment order."
 msgstr ""
 "Wird dem Nutzer angezeigt, wenn die Zahlung noch nicht abgeschlossen ist."
 
-#: pretix_bgukpayment/payment.py:54
+#: pretix_bgukpayment/payment.py:82
 msgid "Payment completed text"
 msgstr "Zahlung vollständig Text"
 
-#: pretix_bgukpayment/payment.py:55
+#: pretix_bgukpayment/payment.py:83
 msgid "Shown to the user when viewing an order with completed payment."
 msgstr "Wird dem Nutzer angezeigt, wenn die Zahlung abgeschlossen ist."
 
-#: pretix_bgukpayment/payment.py:59
+#: pretix_bgukpayment/payment.py:87
 msgid "Organizations"
 msgstr "Organisationen"
 
-#: pretix_bgukpayment/payment.py:60
+#: pretix_bgukpayment/payment.py:88
 msgid ""
 "Here you can provide a list of shorthand keys for all organizations you want "
 "to support. The short names should be alphanumeric and put on seperate "
@@ -76,22 +107,22 @@ msgstr ""
 "Organisationsschlüssel angegeben werden. Seien Sie vorsichtig, wenn Sie "
 "diese Werte ändern."
 
-#: pretix_bgukpayment/payment.py:71
+#: pretix_bgukpayment/payment.py:102
 #, python-format
 msgid "Display name of %s"
 msgstr "Anzeigename von %s"
 
-#: pretix_bgukpayment/payment.py:72
+#: pretix_bgukpayment/payment.py:103
 #, python-format
 msgid "The name of %s displayed to the user"
 msgstr "Der Name von %s, der dem Nutzer angezeigt wird"
 
-#: pretix_bgukpayment/payment.py:79
+#: pretix_bgukpayment/payment.py:110
 #, python-format
 msgid "Instructions for %s"
 msgstr "Anleitung für %s"
 
-#: pretix_bgukpayment/payment.py:80
+#: pretix_bgukpayment/payment.py:111
 #, python-format
 msgid ""
 "The message send to the user with instructions on how to complete the "
@@ -100,38 +131,20 @@ msgstr ""
 "Die Nachricht, die dem Nutzer angezeigt wird und ihm mitteilt, wie er die "
 "Zahlung mit %s abschließen kann"
 
-#: pretix_bgukpayment/payment.py:92
-msgid "Organization"
-msgstr "Organisation"
-
-#: pretix_bgukpayment/payment.py:93
-msgid "Name of your organization"
-msgstr "Name Ihrer Organisation"
-
-#: pretix_bgukpayment/payment.py:99
-#: pretix_bgukpayment/templates/pretix_bgukpayment/checkout_confirm.html:7
-#: pretix_bgukpayment/templates/pretix_bgukpayment/control.html:5
-#: pretix_bgukpayment/templates/pretix_bgukpayment/email/order_pending.txt:6
-#: pretix_bgukpayment/templates/pretix_bgukpayment/pending.html:7
-msgid "Member ID"
-msgstr "Mitgliedsnummer"
-
-#: pretix_bgukpayment/payment.py:100
-msgid "Your member ID at that organization"
-msgstr "Ihre Mitgliedsnummer bei der Organisation"
-
-#: pretix_bgukpayment/payment.py:136 pretix_bgukpayment/payment.py:152
-#: pretix_bgukpayment/payment.py:168 pretix_bgukpayment/payment.py:185
+#: pretix_bgukpayment/payment.py:167 pretix_bgukpayment/payment.py:185
+#: pretix_bgukpayment/payment.py:203 pretix_bgukpayment/payment.py:222
 msgid "No payment information available."
 msgstr "Keine Zahlungsinformationen verfügbar."
 
-#: pretix_bgukpayment/templates/pretix_bgukpayment/checkout_confirm.html:6
-#: pretix_bgukpayment/templates/pretix_bgukpayment/control.html:4
-#: pretix_bgukpayment/templates/pretix_bgukpayment/email/order_pending.txt:5
-#: pretix_bgukpayment/templates/pretix_bgukpayment/pending.html:6
-#| msgid "Organization"
-msgid "Selected organization"
-msgstr "Gewählte Organisation"
+#~ msgid "Name of your organization"
+#~ msgstr "Name Ihrer Organisation"
+
+#~ msgid "Your member ID at that organization"
+#~ msgstr "Ihre Mitgliedsnummer bei der Organisation"
+
+#~| msgid "Organization"
+#~ msgid "Selected organization"
+#~ msgstr "Gewählte Organisation"
 
 #~ msgid "Selected BG/UK:"
 #~ msgstr "Gewählte Organisation:"

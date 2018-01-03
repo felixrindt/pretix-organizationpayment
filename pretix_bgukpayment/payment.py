@@ -11,11 +11,17 @@ from django import forms
 
 class BGUKPayment(BasePaymentProvider):
     identifier = 'bgukpayment'
-    verbose_name = _('Organization Payment')
 
     @property
     def verbose_name(self):
-        return self.settings.get('method_name', as_type=LazyI18nString) or 'Organization'
+        return self.settings.get('method_name', as_type=LazyI18nString) or _('Organization')
+
+    @property
+    def orgafield_name(self):
+        return self.settings.get('organizationname_field', as_type=LazyI18nString) or _('Organization')
+
+    def idfield_name(self):
+        return self.settings.get('idfield_name', as_type=LazyI18nString) or _('Member ID')
 
     def bguk_ids(self):
         l = self.settings.get('organizations_list')
@@ -114,13 +120,13 @@ class BGUKPayment(BasePaymentProvider):
     def payment_form_fields(self):
         bgukName_field = ('bguk',
             forms.ChoiceField(
-            label=self.settings.get('organizationfield_name', as_type=LazyI18nString) or _('Organization'),
+            label=self.orgafield_name,
             required=True,
             choices=[(i, self.settings.get('bguk_label_%s' % i, as_type=LazyI18nString)) for i in self.bguk_ids()]
         ))
         memberID_field = ('memberID',
             forms.CharField(
-            label=self.settings.get('idfield_name', as_type=LazyI18nString) or _('Member ID'),
+            label=self.idfield_name,
             required=True,
         ))
         return OrderedDict([
@@ -148,6 +154,8 @@ class BGUKPayment(BasePaymentProvider):
             'bguk': self.settings.get('bguk_label_%s' % bguk, as_type=LazyI18nString),
             'memberID': request.session.get('payment_%s_memberID' % self.identifier),
             'instructions': self.settings.get('bguk_instructions_%s' % bguk, as_type=LazyI18nString),
+            'orgafield_name': self.orgafield_name,
+            'idfield_name': self.idfield_name,
         }
         return template.render(ctx)
 
@@ -164,6 +172,8 @@ class BGUKPayment(BasePaymentProvider):
             'bguk': self.settings.get('bguk_label_%s' % payment_info['bguk'], as_type=LazyI18nString),
             'memberID': payment_info['memberID'],
             'instructions': self.settings.get('bguk_instructions_%s' % payment_info['bguk'], as_type=LazyI18nString),
+            'orgafield_name': self.orgafield_name,
+            'idfield_name': self.idfield_name,
         }
         return template.render(ctx)
 
@@ -180,6 +190,8 @@ class BGUKPayment(BasePaymentProvider):
             'bguk': self.settings.get('bguk_label_%s' % payment_info['bguk'], as_type=LazyI18nString),
             'memberID': payment_info['memberID'],
             'instructions': self.settings.get('bguk_instructions_%s' % payment_info['bguk'], as_type=LazyI18nString),
+            'orgafield_name': self.orgafield_name,
+            'idfield_name': self.idfield_name,
         }
         return template.render(ctx)
 
@@ -196,6 +208,8 @@ class BGUKPayment(BasePaymentProvider):
             'bguk': self.settings.get('bguk_label_%s' % payment_info['bguk'], as_type=LazyI18nString),
             'memberID': payment_info['memberID'],
             'instructions': self.settings.get('bguk_instructions_%s' % payment_info['bguk'], as_type=LazyI18nString),
+            'orgafield_name': self.orgafield_name,
+            'idfield_name': self.idfield_name,
         }
         return template.render(ctx)
 
@@ -213,5 +227,7 @@ class BGUKPayment(BasePaymentProvider):
             'bguk': self.settings.get('bguk_label_%s' % payment_info['bguk'], as_type=LazyI18nString),
             'memberID': payment_info['memberID'],
             'instructions': self.settings.get('bguk_instructions_%s' % payment_info['bguk'], as_type=LazyI18nString),
+            'orgafield_name': self.orgafield_name,
+            'idfield_name': self.idfield_name,
         }
         return template.render(ctx)
