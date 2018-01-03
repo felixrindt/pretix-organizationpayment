@@ -18,7 +18,7 @@ class BGUKPayment(BasePaymentProvider):
 
     @property
     def orgafield_name(self):
-        return self.settings.get('organizationname_field', as_type=LazyI18nString) or _('Organization')
+        return self.settings.get('organizationfield_name', as_type=LazyI18nString) or _('Organization')
 
     def idfield_name(self):
         return self.settings.get('idfield_name', as_type=LazyI18nString) or _('Member ID')
