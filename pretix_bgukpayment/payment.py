@@ -174,8 +174,8 @@ class BGUKPayment(BasePaymentProvider):
 
     def order_pending_mail_render(self, order) -> str:
         template = get_template('pretix_bgukpayment/order.html')
-        if order.payment_info:
-            payment_info = json.loads(order.payment_info)
+        if 'payment_info' in json.loads(order.meta_info):
+            payment_info = json.loads(order.meta_info)['payment_info']
         else:
             return _("No payment information available.")
         ctx = {
