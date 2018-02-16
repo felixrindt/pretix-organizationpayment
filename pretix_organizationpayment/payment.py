@@ -145,7 +145,7 @@ class OrganizationPayment(BasePaymentProvider):
             required=True,
         ))
         return OrderedDict([
-            orgafield_name_field,
+            organization_name_field,
             memberID_field,
         ])
 
