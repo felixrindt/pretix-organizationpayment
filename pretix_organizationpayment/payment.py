@@ -10,8 +10,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.template.loader import get_template
 from django import forms
 
-class BGUKPayment(BasePaymentProvider):
-    identifier = 'bgukpayment'
+class OrganizationPayment(BasePaymentProvider):
+    identifier = 'organizationpayment'
 
     @property
     def verbose_name(self):
@@ -38,7 +38,7 @@ class BGUKPayment(BasePaymentProvider):
         return rich_text(self.settings.get('payment_completed_text', as_type=LazyI18nString))
 
     @property
-    def bguk_ids(self):
+    def organization_ids(self):
         l = self.settings.get('organizations_list')
         if not l:
             l = ""
@@ -46,7 +46,7 @@ class BGUKPayment(BasePaymentProvider):
 
     def payment_is_valid_session(self, request):
         return all([
-            request.session.get('payment_%s_bguk' % self.identifier, '') != '',
+            request.session.get('payment_%s_organization' % self.identifier, '') != '',
             request.session.get('payment_%s_memberID' % self.identifier, '') != '',
         ])
 
@@ -54,10 +54,10 @@ class BGUKPayment(BasePaymentProvider):
         return False
 
     def payment_perform(self, request, order):
-        bguk = request.session.get('payment_%s_bguk' % self.identifier, '')
+        organization = request.session.get('payment_%s_organization' % self.identifier, '')
         memberID = request.session.get('payment_%s_memberID' % self.identifier, '')
         order.payment_info = json.dumps({
-            'bguk': bguk, 
+            'organization': organization, 
             'memberID': memberID
         })
         order.save(update_fields=['payment_info'])
@@ -103,7 +103,7 @@ class BGUKPayment(BasePaymentProvider):
             help_text = _('Here you can provide a list of shorthand keys for all organizations you want to support. The short names should be alphanumeric and put on seperate lines. After saving you can set a display name and instructions for every organization. Be very careful about changing these.'),
             widget = forms.Textarea(attrs={'placeholder': 'BGW \nBGN \nUKMV \n...'}),
         )
-        bguklist = [
+        organizationlist = [
                 ('method_name', name_field),
                 ('organizationfield_name', organizationname_field),
                 ('idfield_name', idname_field),
@@ -112,8 +112,8 @@ class BGUKPayment(BasePaymentProvider):
                 ('payment_completed_text', completed_field),
                 ('organizations_list', organizations_field),
         ]
-        for i in self.bguk_ids:
-            bguklist.append(('bguk_label_%s' % i, I18nFormField(
+        for i in self.organization_ids:
+            organizationlist.append(('organization_label_%s' % i, I18nFormField(
                 label = _('Display name of %s') % i,
                 help_text = _('The name of %s displayed to the user') % i,
                 widget = I18nTextarea,
@@ -121,7 +121,7 @@ class BGUKPayment(BasePaymentProvider):
                     'rows': '1',
                     'placeholder': 'Organization ... (%s)' % i}},
             )))
-            bguklist.append(('bguk_instructions_%s' % i, I18nFormField(
+            organizationlist.append(('organization_instructions_%s' % i, I18nFormField(
                 label = _('Instructions for %s') % i,
                 help_text = _('The message send to the user with instructions on how to complete the payment using the %s') % i,
                 widget = I18nTextarea,
@@ -129,15 +129,15 @@ class BGUKPayment(BasePaymentProvider):
                     'placeholder': '1. Donwload the form from the %s \n2. Fill out the form \n3. Send the form to ...' % i}},
             )))
 
-        return OrderedDict(list(super().settings_form_fields.items()) + bguklist)
+        return OrderedDict(list(super().settings_form_fields.items()) + organizationlist)
 
     @property
     def payment_form_fields(self):
-        bgukName_field = ('bguk',
+        organization_name_field = ('organization',
             forms.ChoiceField(
             label=self.orgafield_name,
             required=True,
-            choices=[(i, self.settings.get('bguk_label_%s' % i, as_type=LazyI18nString)) for i in self.bguk_ids]
+            choices=[(i, self.settings.get('organization_label_%s' % i, as_type=LazyI18nString)) for i in self.organization_ids]
         ))
         memberID_field = ('memberID',
             forms.CharField(
@@ -145,13 +145,13 @@ class BGUKPayment(BasePaymentProvider):
             required=True,
         ))
         return OrderedDict([
-            bgukName_field,
+            orgafield_name_field,
             memberID_field,
         ])
 
     def payment_form_render(self, request):
         form = self.payment_form(request)
-        template = get_template('pretix_bgukpayment/checkout_payment_form.html')
+        template = get_template('pretix_organizationpayment/checkout_payment_form.html')
         ctx = {
                 'request': request, 
                 'form': form,
@@ -160,61 +160,61 @@ class BGUKPayment(BasePaymentProvider):
         return template.render(ctx)
     
     def checkout_confirm_render(self, request):
-        template = get_template('pretix_bgukpayment/order.html')
-        bguk = request.session.get('payment_%s_bguk' % self.identifier)
+        template = get_template('pretix_organizationpayment/order.html')
+        organization = request.session.get('payment_%s_organization' % self.identifier)
         ctx = {
             'information_text': self.information_text,
-            'bguk': self.settings.get('bguk_label_%s' % bguk, as_type=LazyI18nString),
+            'organization': self.settings.get('organization_label_%s' % organization, as_type=LazyI18nString),
             'memberID': request.session.get('payment_%s_memberID' % self.identifier),
-            'instructions': self.settings.get('bguk_instructions_%s' % bguk, as_type=LazyI18nString),
+            'instructions': self.settings.get('organization_instructions_%s' % organization, as_type=LazyI18nString),
             'orgafield_name': self.orgafield_name,
             'idfield_name': self.idfield_name,
         }
         return template.render(ctx)
 
     def order_pending_mail_render(self, order) -> str:
-        template = get_template('pretix_bgukpayment/email.html')
+        template = get_template('pretix_organizationpayment/email.html')
         if 'payment_info' in json.loads(order.meta_info):
             payment_info = json.loads(order.meta_info)['payment_info']
         else:
             return _("No payment information available.")
         ctx = {
             'information_text': self.payment_pending_text,
-            'bguk': self.settings.get('bguk_label_%s' % payment_info['bguk'], as_type=LazyI18nString),
+            'organization': self.settings.get('organization_label_%s' % payment_info['organization'], as_type=LazyI18nString),
             'memberID': payment_info['memberID'],
-            'instructions': self.settings.get('bguk_instructions_%s' % payment_info['bguk'], as_type=LazyI18nString),
+            'instructions': self.settings.get('organization_instructions_%s' % payment_info['organization'], as_type=LazyI18nString),
             'orgafield_name': self.orgafield_name,
             'idfield_name': self.idfield_name,
         }
         return template.render(ctx)
 
     def order_pending_render(self, request, order) -> str:
-        template = get_template('pretix_bgukpayment/order.html')
+        template = get_template('pretix_organizationpayment/order.html')
         if order.payment_info:
             payment_info = json.loads(order.payment_info)
         else:
             return _("No payment information available.")
         ctx = {
             'information_text': self.payment_pending_text,
-            'bguk': self.settings.get('bguk_label_%s' % payment_info['bguk'], as_type=LazyI18nString),
+            'organization': self.settings.get('organization_label_%s' % payment_info['organization'], as_type=LazyI18nString),
             'memberID': payment_info['memberID'],
-            'instructions': self.settings.get('bguk_instructions_%s' % payment_info['bguk'], as_type=LazyI18nString),
+            'instructions': self.settings.get('organization_instructions_%s' % payment_info['organization'], as_type=LazyI18nString),
             'orgafield_name': self.orgafield_name,
             'idfield_name': self.idfield_name,
         }
         return template.render(ctx)
 
     def order_completed_render(self, request, order) -> str:
-        template = get_template('pretix_bgukpayment/order.html')
+        template = get_template('pretix_organizationpayment/order.html')
         if order.payment_info:
             payment_info = json.loads(order.payment_info)
         else:
             return _("No payment information available.")
         ctx = {
             'information_text': self.payment_completed_text,
-            'bguk': self.settings.get('bguk_label_%s' % payment_info['bguk'], as_type=LazyI18nString),
+            'organization': self.settings.get('organization_label_%s' % payment_info['organization'], as_type=LazyI18nString),
             'memberID': payment_info['memberID'],
-            'instructions': self.settings.get('bguk_instructions_%s' % payment_info['bguk'], as_type=LazyI18nString),
+            'instructions': self.settings.get('organization_instructions_%s' % payment_info['organization'], as_type=LazyI18nString),
             'orgafield_name': self.orgafield_name,
             'idfield_name': self.idfield_name,
         }
@@ -222,13 +222,13 @@ class BGUKPayment(BasePaymentProvider):
 
 
     def order_control_render(self, request, order) -> str:
-        template = get_template('pretix_bgukpayment/control.html')
+        template = get_template('pretix_organizationpayment/control.html')
         if order.payment_info:
             payment_info = json.loads(order.payment_info)
         else:
             return _("No payment information available.")
         ctx = {
-            'bguk': self.settings.get('bguk_label_%s' % payment_info['bguk'], as_type=LazyI18nString),
+            'organization': self.settings.get('organization_label_%s' % payment_info['organization'], as_type=LazyI18nString),
             'memberID': payment_info['memberID'],
             'orgafield_name': self.orgafield_name,
             'idfield_name': self.idfield_name,

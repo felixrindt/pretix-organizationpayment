@@ -24,11 +24,11 @@ cmdclass = {
 
 
 setup(
-    name='pretix-bgukpayment',
+    name='pretix-organizationpayment',
     version='1.0.0',
     description='This pretix plugin adds a payment provider for german Berufsgenossenschaft and Unfallkasse asking for organization name and member ID.',
     long_description=long_description,
-    url='https://github.com/felixrindt/pretix-bgukpayment',
+    url='https://github.com/felixrindt/pretix-organizationpayment',
     author='Felix Rindt',
     author_email='felix@rindt.me',
     license='Apache Software License',
@@ -39,6 +39,6 @@ setup(
     cmdclass=cmdclass,
     entry_points="""
 [pretix.plugin]
-pretix_bgukpayment=pretix_bgukpayment:PretixPluginMeta
+pretix_organizationpayment=pretix_organizationpayment:PretixPluginMeta
 """,
 )

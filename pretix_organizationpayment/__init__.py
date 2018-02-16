@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy
 
 
 class PluginApp(AppConfig):
-    name = 'pretix_bgukpayment'
+    name = 'pretix_organizationpayment'
     verbose_name = 'Organization Payment Provider'
 
     class PretixPluginMeta:
@@ -18,4 +18,4 @@ class PluginApp(AppConfig):
         from . import signals  # NOQA
 
 
-default_app_config = 'pretix_bgukpayment.PluginApp'
+default_app_config = 'pretix_organizationpayment.PluginApp'
