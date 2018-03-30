@@ -1,0 +1,8 @@
+{% load i18n %}
+
+<p>
+    {% url "control:event.order" organizer=event.organizer.slug event=event.slug code=order as ourl %}
+    {% blocktrans trimmed with order="<a href='"|add:ourl|add:"'>"|add:order|add:"</a>"|safe %}
+    The order {{ order }} was placed using payment via <b>{{ name }}</b>!
+    {% endblocktrans %}
+</p>
