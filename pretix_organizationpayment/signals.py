@@ -24,7 +24,6 @@ def register_order_meta(sender, request, **kwargs):
 
 @receiver(requiredaction_display, dispatch_uid="organizationpayment_requiredaction_display")
 def pretixcontrol_action_display(sender, action, request, **kwargs):
-    print("hihi")
     from .payment import OrganizationPayment
     if not action.action_type.startswith('pretix.plugins.organizationpayment.placed'):
         return
