@@ -2,11 +2,9 @@ Organization Payment Provider
 ==========================
 
 This is a plugin for `pretix`_. 
-It adds a payment provider for organizations. A user can choose from a predefined list of organizations and also has to provide a member ID there. You can use it for university accounts or sponsor partners.
+It adds a payment provider for organizations. A user can choose from a predefined list of organizations and also has to provide a member ID there. You can use it for university accounts or sponsor partners. If you want, set the payment fees to -100% to reflect that behavior.
 
-It was originally designed for the german Berufsgenossenschaft and Unfallkasse which pay for first aid trainings employees can do.
-
-All texts shown to the user are customizable to make this plugin work in many different situations.
+I built this for a situation in which neither vouchers nor additional products were a suitable solution. Still, all texts shown to the user are customizable to make this plugin work in many different situations.
 
 Development setup
 -----------------
