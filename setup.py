@@ -25,8 +25,8 @@ cmdclass = {
 
 setup(
     name='pretix-organizationpayment',
-    version='1.0.0',
-    description='This pretix plugin adds a payment provider for german Berufsgenossenschaft and Unfallkasse asking for organization name and member ID.',
+    version='2.0.0',
+    description='This pretix plugin adds a flexible payment provider. A user can select one of the configured Organizations and also provides data in an additional field with configurable annotation.',
     long_description=long_description,
     url='https://github.com/felixrindt/pretix-organizationpayment',
     author='Felix Rindt',

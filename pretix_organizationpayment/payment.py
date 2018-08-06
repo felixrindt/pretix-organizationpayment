@@ -16,7 +16,7 @@ class OrganizationPayment(BasePaymentProvider):
 
     @property
     def verbose_name(self):
-        return str(self.settings.get('method_name', as_type=LazyI18nString)) or _('Organization')
+        return str(self.settings.get('method_name', as_type=LazyI18nString) or _('Organization'))
 
     @property
     def orgafield_name(self):
@@ -54,17 +54,17 @@ class OrganizationPayment(BasePaymentProvider):
     def order_change_allowed(self, order):
         return False
 
-    def payment_perform(self, request, order):
+    def execute_payment(self, request, payment):
         organization = request.session.get('payment_%s_organization' % self.identifier, '')
         memberID = request.session.get('payment_%s_memberID' % self.identifier, '')
-        order.payment_info = json.dumps({
+        payment.info = json.dumps({
             'organization': organization, 
             'memberID': memberID
         })
-        order.save(update_fields=['payment_info'])
+        payment.save(update_fields=['info'])
         RequiredAction.objects.create(
-            event=order.event, action_type='pretix.plugins.organizationpayment.placed', data=json.dumps({
-                'order': order.code,
+            event=payment.order.event, action_type='pretix.plugins.organizationpayment.placed', data=json.dumps({
+                'order': payment.order.code,
             })
         )
         return None
@@ -194,10 +194,10 @@ class OrganizationPayment(BasePaymentProvider):
         }
         return template.render(ctx)
 
-    def order_pending_render(self, request, order) -> str:
+    def payment_pending_render(self, request, payment) -> str:
         template = get_template('pretix_organizationpayment/order.html')
-        if order.payment_info:
-            payment_info = json.loads(order.payment_info)
+        if payment.info:
+            payment_info = json.loads(payment.info)
         else:
             return _("No payment information available.")
         ctx = {
@@ -227,10 +227,10 @@ class OrganizationPayment(BasePaymentProvider):
         return template.render(ctx)
 
 
-    def order_control_render(self, request, order) -> str:
+    def payment_control_render(self, request, payment) -> str:
         template = get_template('pretix_organizationpayment/control.html')
-        if order.payment_info:
-            payment_info = json.loads(order.payment_info)
+        if payment.info:
+            payment_info = json.loads(payment.info)
         else:
             return _("No payment information available.")
         ctx = {
