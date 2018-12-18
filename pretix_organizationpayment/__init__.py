@@ -12,7 +12,7 @@ class PluginApp(AppConfig):
         description = ugettext_lazy('This pretix plugin adds a payment provider for organizations like the german Berufsgenossenschaft or Unfallkasse. It lets the user select an organization and asks for a member ID. You can define texts displayed to the user as well as the organizations you want to support with seperate instruction text for each of them.')
         visible = True
         restricted = False
-        version = '1.0.0'
+        version = '2.0.0'
 
     def ready(self):
         from . import signals  # NOQA
