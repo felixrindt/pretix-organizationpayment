@@ -1,9 +1,7 @@
 from django.dispatch import receiver
 
-from pretix.base.signals import register_payment_providers, requiredaction_display
+from pretix.base.signals import register_payment_providers
 from pretix.presale.signals import order_meta_from_request
-import json
-from django.template.loader import get_template
 
 @receiver(register_payment_providers, dispatch_uid="payment_organization.provider")
 def register_payment_provider(sender, **kwargs):
@@ -21,15 +19,3 @@ def register_order_meta(sender, request, **kwargs):
             'memberID': memberID
         }}
     return {}
-
-@receiver(requiredaction_display, dispatch_uid="organizationpayment_requiredaction_display")
-def pretixcontrol_action_display(sender, action, request, **kwargs):
-    from .payment import OrganizationPayment
-    if not action.action_type.startswith('pretix.plugins.organizationpayment.placed'):
-        return
-    data = json.loads(action.data)
-    template = get_template('pretix_organizationpayment/requiredaction.html')
-    pp = sender.get_payment_providers().get(OrganizationPayment.identifier)
-    ctx = {'order': data['order'], 'event': sender, 'name': pp.verbose_name}
-    return template.render(ctx, request)
-

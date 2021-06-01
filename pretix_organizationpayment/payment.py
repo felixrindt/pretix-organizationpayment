@@ -5,7 +5,6 @@ from i18nfield.fields import I18nFormField, I18nTextarea
 from i18nfield.strings import LazyI18nString
 
 from pretix.base.payment import BasePaymentProvider
-from pretix.base.models import RequiredAction
 from pretix.base.templatetags.rich_text import rich_text
 from django.utils.translation import ugettext_lazy as _
 from django.template.loader import get_template
@@ -62,11 +61,6 @@ class OrganizationPayment(BasePaymentProvider):
             'memberID': memberID
         })
         payment.save(update_fields=['info'])
-        RequiredAction.objects.create(
-            event=payment.order.event, action_type='pretix.plugins.organizationpayment.placed', data=json.dumps({
-                'order': payment.order.code,
-            })
-        )
         return None
 
     @property
